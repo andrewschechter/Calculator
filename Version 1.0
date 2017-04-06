@@ -1,0 +1,172 @@
+/*
+ **************************************************************
+            Arduino Calculator Version 1.0   
+                by Andrew Schechter
+ 1.) first stable version with all standard mathematical
+ operations, (+, -, *, /). only supports single integer
+ operands
+ 2.) Future Updates will include:
+ - multinumber float operands rather than single integers
+ - clear function
+ - possibly sin, cos, tangent
+ - squareroot
+ -shift key which will allow access to almost twice as many keys
+ **************************************************************
+*/
+
+//lcd
+#include <LiquidCrystal.h>
+
+
+//LiquidCrystal lcd(RS, E, DB4, DB5, DB6, DB7)
+LiquidCrystal lcd(8, 14, 10, 11, 12, 13);
+
+int con = 50; //set contrast of lcd
+
+//keypad
+#include <Keypad.h>
+
+
+const byte numRows= 4; //number of rows on the keypad
+const byte numCols= 4; //number of columns on the keypad
+
+int number_1 = 0;
+int number_2 = 0;
+char myOperator = 0;
+
+//keymap defines the key pressed according to the row and columns just as appears on the keypad
+char keymap[numRows][numCols]= 
+{
+{'1', '2', '3', '+'}, 
+{'4', '5', '6', '-'}, 
+{'7', '8', '9', '*'},
+{'C', '0', '=', '/'}
+};
+
+//setting up the keypad connections to the arduino terminals
+byte rowPins[numRows] = {7,6,5,4}; //Rows 0 to 4
+byte colPins[numCols]= {3,2,17,16}; //Columns 0 to 4
+
+//initializes an instance of the Keypad class
+Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
+
+
+
+void setup() {
+  Serial.begin(9600);       //start serial comm
+  
+  lcd.begin(16, 2); // set up the LCD's number of columns and rows:
+  analogWrite(9,con); //setting contrast of lcd manually instead of using a potentiometer
+  
+  lcd.print("Calculator 1.0");
+  delay(1000);
+  lcd.clear();
+
+
+  
+}  
+void loop() {
+//get first number
+lcd.print("Enter 1st: ");
+
+  //wait for number 1 to be pressed
+  while(number_1 == 0) 
+  {
+     number_1 = myKeypad.getKey();
+  }
+
+number_1 = number_1 - '0'; //convert char to decimal
+lcd.print(number_1);
+delay(1000);
+lcd.clear();
+
+//get second number
+lcd.print("Enter 2nd: "); 
+
+  //wait for number 2 to be pressed
+  while(number_2 == 0) 
+  {
+     number_2 = myKeypad.getKey();
+  }
+
+number_2 = number_2 - '0'; //convert char to decimal
+lcd.print(number_2);
+  delay(1000);
+  lcd.clear();
+
+//get operator
+lcd.print("Enter Op: ");
+  //wait for operator to be pressed
+  while(myOperator == 0) 
+  {
+      myOperator = myKeypad.getKey();  
+  }
+
+switch(myOperator) {
+
+  case '+':
+    lcd.print("+");
+    delay(1000);
+    lcd.clear();  
+    lcd.setCursor(0,1);
+    lcd.print(number_1 + number_2);
+    delay(3000);
+    lcd.clear();
+    number_1 = 0;
+    number_2 = 0;
+    myOperator = 0;
+
+  break;
+
+  case '-':
+    lcd.print("-");
+    delay(1000);
+    lcd.clear();  
+    lcd.setCursor(0,1);
+    lcd.print(number_1 - number_2);
+    delay(3000);
+    lcd.clear();
+    number_1 = 0;
+    number_2 = 0;
+    myOperator = 0;
+
+  break;
+
+  case '*':
+    lcd.print("*");
+    delay(1000);
+    lcd.clear();  
+    lcd.setCursor(0,1);
+    lcd.print(number_1 * number_2);
+    delay(3000);
+    lcd.clear();
+    number_1 = 0;
+    number_2 = 0;
+    myOperator = 0;
+
+   break;
+
+   case '/':
+    lcd.print("/");
+    delay(1000);
+    lcd.clear();  
+    lcd.setCursor(0,1);
+    lcd.print(float(number_1 / number_2));
+    delay(3000);
+    lcd.clear();
+    number_1 = 0;
+    number_2 = 0;
+    myOperator = 0;
+
+   break;
+  
+  //if none of the above are pressed reset code
+  default:
+  //final reset
+  lcd.clear();
+  number_1 = 0;
+  number_2 = 0;
+  myOperator = 0;
+  }
+
+}   
